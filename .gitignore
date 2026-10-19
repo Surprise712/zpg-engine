@@ -1,0 +1,20 @@
+# Visual Studio dočasné a vygenerované soubory
+.vs/
+*.ipch
+*.db
+*.opendb
+*.sdf
+
+# Výstupní složky sestavení (Build output)
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bin/
+obj/
+
+# Uživatelské nastavení Visual Studia
+*.user
+*.userosv
+*.suo
