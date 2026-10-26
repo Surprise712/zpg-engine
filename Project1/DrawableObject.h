@@ -25,7 +25,7 @@ public:
     DrawableObject(const DrawableObject&) = delete;
     DrawableObject& operator=(const DrawableObject&) = delete;
 
-    void draw() const;
+    void draw(const glm::vec3& cameraPosition) const;
 
     Transformation* getTransformation();
     const Transformation* getTransformation() const;

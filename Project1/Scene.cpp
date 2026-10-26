@@ -59,6 +59,8 @@ DrawableObject* Scene::addObject(
 
 void Scene::draw(float time) const
 {
+    // Tento cyklus je v pořádku - updatuje čas pro všechny shadery najednou.
+    // (OpenGL si uniformní proměnné pamatuje uvnitř každého shader programu)
     for (const auto& shader : shaderPrograms)
     {
         shader->use();
@@ -67,7 +69,9 @@ void Scene::draw(float time) const
 
     for (const auto& object : objects)
     {
-        object->draw();
+        // Změněno z camera->Position na camera.Position
+        // (Případně použijte camera.getPosition(), pokud je proměnná privátní a máte na ni getter)
+        object->draw(camera.getPosition());
     }
 }
 

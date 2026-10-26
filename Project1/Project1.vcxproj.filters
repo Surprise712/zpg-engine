@@ -60,6 +60,15 @@
     <None Include="..\shaders\clock.vert">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\shaders\lambert.frag" />
+    <None Include="..\shaders\phong.frag" />
+    <None Include="..\shaders\light.vert" />
+    <None Include="..\shaders\blinn_phong.frag" />
+    <None Include="..\shaders\constant.frag" />
+    <None Include="planets.vert" />
+    <None Include="..\shaders\earth.frag" />
+    <None Include="..\shaders\moon.frag" />
+    <None Include="..\shaders\sun.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -90,6 +99,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BEN0339.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\bushes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\clock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\earth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\moon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\sun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\steelAxe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

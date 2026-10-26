@@ -44,4 +44,6 @@ public:
 
     void move(float forward, float sideways);
 
+    glm::vec3 getPosition() const;
+
 };

@@ -43,29 +43,29 @@ Model::Model(
 
 
     
-    // Position
+    // 0: Pozice (vždy)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-        0,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        currentFloatsPerVertex * sizeof(float),
-        reinterpret_cast<void*>(0)
-    );
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, currentFloatsPerVertex * sizeof(float), reinterpret_cast<void*>(0));
 
-    // Color
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(
-        1,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        currentFloatsPerVertex * sizeof(float),
-        reinterpret_cast<void*>(
-            currentColorOffset * sizeof(float)
-            )
-    );
+    if (currentFloatsPerVertex == 9)
+    {
+        // Země/Slunce: Normála (offset 6), Barva (offset 3)
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+    }
+    else
+    {
+        // Měsíc/Koule: Normála (offset 3)
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+
+        // VYPNOUT čtení barvy z pole a nastavit VÝCHOZÍ šedou barvu pro celý model
+        glDisableVertexAttribArray(2);
+        glVertexAttrib3f(2, 0.6f, 0.6f, 0.6f);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

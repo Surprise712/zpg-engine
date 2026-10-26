@@ -8,8 +8,8 @@ ShaderProgram::ShaderProgram(
     const char* vertexShaderFile,
     const char* fragmentShaderFile)
     : vertexShader(GL_VERTEX_SHADER, vertexShaderFile),
-      fragmentShader(GL_FRAGMENT_SHADER, fragmentShaderFile),
-      id(0)
+    fragmentShader(GL_FRAGMENT_SHADER, fragmentShaderFile),
+    id(0)
 {
     linkProgram();
 }
@@ -27,7 +27,7 @@ bool ShaderProgram::linkProgram()
     if (!vertexShader.isValid() || !fragmentShader.isValid())
     {
         std::cout << "Shader program cannot be linked because a shader is invalid."
-                  << std::endl;
+            << std::endl;
         return false;
     }
 
@@ -47,7 +47,7 @@ bool ShaderProgram::linkProgram()
         glGetProgramInfoLog(id, sizeof(infoLog), nullptr, infoLog);
 
         std::cout << "Shader program linking failed:\n"
-                  << infoLog << std::endl;
+            << infoLog << std::endl;
 
         glDeleteProgram(id);
         id = 0;
@@ -84,10 +84,10 @@ GLint ShaderProgram::getUniformLocation(const std::string& name) const
 {
     GLint location = glGetUniformLocation(id, name.c_str());
 
-    if (location == -1)
-    {
-        std::cout << "Uniform not found: " << name << std::endl;
-    }
+    //if (location == -1)
+    //{
+    //    std::cout << "Uniform not found: " << name << std::endl;
+    //}
 
     return location;
 }
@@ -136,7 +136,7 @@ void ShaderProgram::setUniform(
 
     if (location != -1)
     {
-        glUniformMatrix4fv(location,1,GL_FALSE,glm::value_ptr(value));
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
     }
 }
 

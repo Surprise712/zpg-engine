@@ -9,7 +9,7 @@
 Camera::Camera()
     : viewMatrix(1.0f),
       projectionMatrix(glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f)),
-      eye(0.0f, 0.0f, 3.0f),
+      eye(0.0f, 0.0f, 0.0f),
       target(0.0f, 0.0f, -1.0f),
       up(0.0f, 1.0f, 0.0f),
       alpha(glm::radians(90.0f)),
@@ -110,4 +110,9 @@ void Camera::move(float forward, float sideways)
     notifyObservers();
 }
 
+
+glm::vec3 Camera::getPosition() const
+{
+    return eye;
+}
 

@@ -112,6 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libraries\glfw-3.5.1.bin.WIN64\glfw-3.5.1.bin.WIN64\include;$(SolutionDir)Libraries\glm-1.0.3\glm;$(SolutionDir)Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>C:\Users\bensz\Desktop\ZPG HW new\zpg-engine\Project1\Models;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,11 +160,20 @@
     <None Include="..\shaders\basic.frag" />
     <None Include="..\shaders\basic.vert" />
     <None Include="..\shaders\basic2.frag" />
+    <None Include="..\shaders\blinn_phong.frag" />
     <None Include="..\shaders\clock.frag" />
     <None Include="..\shaders\clock.vert" />
+    <None Include="..\shaders\constant.frag" />
+    <None Include="..\shaders\earth.frag" />
+    <None Include="..\shaders\lambert.frag" />
+    <None Include="..\shaders\light.vert" />
+    <None Include="..\shaders\moon.frag" />
+    <None Include="..\shaders\phong.frag" />
+    <None Include="..\shaders\sun.frag" />
     <None Include="..\shaders\tree.frag" />
     <None Include="..\shaders\tree.vert" />
     <None Include="..\shaders\yellow.frag" />
+    <None Include="planets.vert" />
     <None Include="tree.frag" />
     <None Include="tree.vert" />
   </ItemGroup>
@@ -173,6 +183,14 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraObserver.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Models\bushes.h" />
+    <ClInclude Include="Models\clock.h" />
+    <ClInclude Include="Models\earth.h" />
+    <ClInclude Include="Models\moon.h" />
+    <ClInclude Include="Models\sphere.h" />
+    <ClInclude Include="Models\steelAxe.h" />
+    <ClInclude Include="Models\sun.h" />
+    <ClInclude Include="Models\tree.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Shader.h" />

@@ -9,15 +9,16 @@
 #include "ShaderProgram.h"
 #include "Transformation.h"
 
-#include "tree.h"
-#include "bushes.h"
-#include "sphere.h"
+#include "Models/tree.h"
+#include "Models/bushes.h"
+#include "Models/sphere.h"
 
-#include "BEN0339.h"
-#include "earth.h"
-#include "sun.h"
-#include "moon.h"
-#include "clock.h"
+#include "Models/BEN0339.h"
+#include "Models/earth.h"
+#include "Models/sun.h"
+#include "Models/moon.h"
+#include "Models/clock.h"
+#include "Models/steelAxe.h"
 
 
 #include <cstdlib>
@@ -156,6 +157,8 @@ void Application::createScenes()
     scene->addObject(std::make_unique<DrawableObject>( model, shaderProgram,std::move(transformation)));
 
     scenes.push_back(std::move(scene));
+
+    scenes[0]->moveCamera(-3.0f, 0.0f);
 
     //==Forrest Scene==
 
@@ -343,9 +346,12 @@ void Application::createScenes()
     auto galaxyScene = std::make_unique<Scene>();
     Model::setVertexFormat(9, 3); //set format
 
-    ShaderProgram* galaxyShaderProgram = galaxyScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/basic.vert", "../shaders/basic.frag"));
-
     //Sun
+    ShaderProgram* galaxySunShaderProgram = galaxyScene->addShaderProgram(std::make_unique<ShaderProgram>(
+        "../shaders/planets.vert", 
+        "../shaders/sun.frag"
+    ));
+
     Model* modelOrb = galaxyScene->addModel(std::make_unique<Model>(sun, sizeof(sun)));
 
     transformation = std::make_unique<CompositeTransformation>();
@@ -353,9 +359,14 @@ void Application::createScenes()
     transformation->addTransformation(std::make_unique<DynRotation>(0.5f, glm::vec3(0.2f, 0.0f, 0.0f)));
     transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.18f)));
 
-    galaxyScene->addObject(std::make_unique<DrawableObject>(modelOrb, galaxyShaderProgram, std::move(transformation)));
+    galaxyScene->addObject(std::make_unique<DrawableObject>(modelOrb, galaxySunShaderProgram, std::move(transformation)));
 
     //Earth
+    ShaderProgram* earthShaderProgram = galaxyScene->addShaderProgram(std::make_unique<ShaderProgram>(
+        "../shaders/planets.vert",
+        "../shaders/earth.frag"
+    ));
+
     Model* modelEarth = galaxyScene->addModel(std::make_unique<Model>(earth, sizeof(earth)));
 
     transformation = std::make_unique<CompositeTransformation>();
@@ -364,9 +375,14 @@ void Application::createScenes()
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.5f, 0.0f)));
     transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.1)));
 
-    galaxyScene->addObject(std::make_unique<DrawableObject>(modelEarth, galaxyShaderProgram, std::move(transformation)));
+    galaxyScene->addObject(std::make_unique<DrawableObject>(modelEarth, earthShaderProgram, std::move(transformation)));
 
     //Moon
+    ShaderProgram* moonShaderProgram = galaxyScene->addShaderProgram(std::make_unique<ShaderProgram>(
+        "../shaders/planets.vert",
+        "../shaders/moon.frag"
+    ));
+
     Model* modelMoon = galaxyScene->addModel(std::make_unique<Model>(moon, sizeof(moon)));
 
     transformation = std::make_unique<CompositeTransformation>();
@@ -377,13 +393,40 @@ void Application::createScenes()
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.2f, 0.0f, 0.0f)));
     transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.05f)));
 
-    galaxyScene->addObject(std::make_unique<DrawableObject>(modelMoon, galaxyShaderProgram, std::move(transformation)));
+    galaxyScene->addObject(std::make_unique<DrawableObject>(modelMoon, moonShaderProgram, std::move(transformation)));
 
+
+    //Axe
+
+    Model* modelAxe = galaxyScene->addModel(std::make_unique<Model>(axe, sizeof(axe)));
+
+    transformation = std::make_unique<CompositeTransformation>();
+
+    transformation->addTransformation(std::make_unique<DynRotation>(0.8f, glm::vec3(0.0f, 0.2f, 0.0f)));
+    transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.9f, 0.0f, 0.0f)));
+    transformation->addTransformation(std::make_unique<DynRotation>(0.5f, glm::vec3(0.0f, 0.0f, 0.5f)));
+    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.1)));
+    transformation->addTransformation(std::make_unique<Rotation>(90.0f, glm::vec3(1.0f, 0.0f, 0.0f)));
+
+    galaxyScene->addObject(std::make_unique<DrawableObject>(modelAxe, earthShaderProgram, std::move(transformation)));
+
+    Model::resetVertexFormat();
+
+    // login
+    Model* modelgLogin = galaxyScene->addModel(std::make_unique<Model>(login, sizeof(login)));
+
+    auto galaxyLoginTransformation = std::make_unique<CompositeTransformation>();
+    galaxyLoginTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 4.0f, -8.0f)));
+    galaxyLoginTransformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.9f)));
+
+    galaxyScene->addObject(std::make_unique<DrawableObject>(modelgLogin, galaxySunShaderProgram, std::move(galaxyLoginTransformation)));
 
 
     scenes.push_back(std::move(galaxyScene));
 
+    scenes[2]->moveCamera(-3.0f, 0.0f);
 
+    // == Clock Scene ==
 
     auto clockScene = std::make_unique<Scene>();
 
@@ -410,6 +453,77 @@ void Application::createScenes()
 );
 
     scenes.push_back(std::move(clockScene));
+
+    scenes[3]->moveCamera(-3.0f, 0.0f);
+
+    // == Spheres Light Scene ==
+
+    auto spheresScene = std::make_unique<Scene>();
+
+    //for different shaders change to constant.frag, lambert.frag, phong.frag or blinn_phong.frag
+    ShaderProgram* sphereShaderProgram1 = spheresScene->addShaderProgram(
+        std::make_unique<ShaderProgram>(
+            "../shaders/light.vert",
+            "../shaders/constant.frag"
+        )
+    );
+    ShaderProgram* sphereShaderProgram2 = spheresScene->addShaderProgram(
+        std::make_unique<ShaderProgram>(
+            "../shaders/light.vert",
+            "../shaders/lambert.frag"
+        )
+    );
+    ShaderProgram* sphereShaderProgram3 = spheresScene->addShaderProgram(
+        std::make_unique<ShaderProgram>(
+            "../shaders/light.vert",
+            "../shaders/phong.frag"
+        )
+    );
+    ShaderProgram* sphereShaderProgram4 = spheresScene->addShaderProgram(
+        std::make_unique<ShaderProgram>(
+            "../shaders/light.vert",
+            "../shaders/blinn_phong.frag"
+        )
+    );
+
+    Model::setVertexFormat(6, 3);
+
+    Model* modelSphere = spheresScene->addModel(std::make_unique<Model>(sphere, sizeof(sphere)));
+
+    //Sphere 1
+    auto sphereTransformation = std::make_unique<CompositeTransformation>();
+
+    sphereTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(3.0f, 0.0f, 0.0f)));
+
+    spheresScene->addObject(std::make_unique<DrawableObject>(modelSphere, sphereShaderProgram1, std::move(sphereTransformation)));
+    
+    //Sphere 2
+    auto sphereTransformation2 = std::make_unique<CompositeTransformation>();
+
+    sphereTransformation2->addTransformation(std::make_unique<Translation>(glm::vec3(-3.0f, 0.0f, 0.0f)));
+
+    spheresScene->addObject(std::make_unique<DrawableObject>(modelSphere, sphereShaderProgram2, std::move(sphereTransformation2)));
+
+    //Sphere 3
+    auto sphereTransformation3 = std::make_unique<CompositeTransformation>();
+
+    sphereTransformation3->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.0f, 3.0f)));
+
+    spheresScene->addObject(std::make_unique<DrawableObject>(modelSphere, sphereShaderProgram3, std::move(sphereTransformation3)));
+
+    //Sphere 4
+    auto sphereTransformation4 = std::make_unique<CompositeTransformation>();
+
+    sphereTransformation4->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.0f, -3.0f)));
+
+    spheresScene->addObject(std::make_unique<DrawableObject>(modelSphere, sphereShaderProgram4, std::move(sphereTransformation4)));
+
+    scenes.push_back(std::move(spheresScene));
+
+    //Camera movement
+    scenes[4]->rotateCamera(90.0f, 0.0f);
+    scenes[4]->moveCamera(-8.0f, 0.0f);
+
 }
 
 
@@ -568,8 +682,10 @@ int Application::run()
 
     double lastFrame = glfwGetTime();
 
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         double currentFrame = glfwGetTime();
         float deltaTime = static_cast<float>(currentFrame - lastFrame);
         lastFrame = currentFrame;
