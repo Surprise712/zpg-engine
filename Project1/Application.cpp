@@ -2,6 +2,9 @@
 #include <glad/gl.h>
 #undef GLAD_GL_IMPLEMENTATION
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include "Application.h"
 #include "Scene.h"
 #include "DrawableObject.h"
@@ -676,6 +679,72 @@ void Application::createScenes()
 
     scenes.push_back(std::move(nforestScene));
 
+
+
+
+
+
+
+    // === Texture Scene ===
+    auto textureScene = std::make_unique<Scene>();
+
+    const float plain[] = {
+        //vrchol,           normála,            uv souřadnice
+        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+        1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+
+       -1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f
+    };
+
+    auto textureShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
+
+    //vertex buffer object (VBO)
+    GLuint VBO = 0;
+    glGenBuffers(1, &VBO); // generate the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(plain), plain, GL_STATIC_DRAW);
+    //vertex attribute object(VAO)
+    GLuint VAO = 0;
+    glGenVertexArrays(1, &VAO); //generate the VAO
+    glBindVertexArray(VAO); //bind the VAO
+    glEnableVertexAttribArray(0); //enable vertex attributes
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(6 * sizeof(float)));
+
+    int text_width, text_height, channels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load("Models/wooden_fence.png", &text_width, &text_height, &channels, 4);
+    if (!data) {
+        std::cerr << "Error loading texture: wooden_fence.png" << std::endl;
+    }
+    glActiveTexture(GL_TEXTURE0);
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, text_width, text_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(data);
+
+    //Set texture unit to fragment shader
+    GLint uniformID = glGetUniformLocation(textureShader->getId(), "../shaders/texture.frag");
+    glUniform1i(uniformID, 0);
+
+    scenes.push_back(std::move(textureScene));
 
 
 }

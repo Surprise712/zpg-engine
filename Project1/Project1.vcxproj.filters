@@ -74,6 +74,8 @@
     <None Include="..\shaders\night_bush.vert" />
     <None Include="..\shaders\night_ground.vert" />
     <None Include="..\shaders\firefly.vert" />
+    <None Include="..\shaders\texture.frag" />
+    <None Include="..\shaders\texture.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -128,6 +130,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Models\steelAxe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libraries\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

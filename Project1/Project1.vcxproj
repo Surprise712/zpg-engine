@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libraries\glfw-3.5.1.bin.WIN64\glfw-3.5.1.bin.WIN64\include;$(SolutionDir)Libraries\glm-1.0.3\glm;$(SolutionDir)Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\;$(ProjectDir);$(SolutionDir)Libraries\glfw-3.5.1.bin.WIN64\glfw-3.5.1.bin.WIN64\include;$(SolutionDir)Libraries\glm-1.0.3\glm;$(SolutionDir)Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>C:\Users\bensz\Desktop\ZPG HW new\zpg-engine\Project1\Models;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
@@ -175,6 +175,8 @@
     <None Include="..\shaders\night_tree.vert" />
     <None Include="..\shaders\phong.frag" />
     <None Include="..\shaders\sun.frag" />
+    <None Include="..\shaders\texture.frag" />
+    <None Include="..\shaders\texture.vert" />
     <None Include="..\shaders\tree.frag" />
     <None Include="..\shaders\tree.vert" />
     <None Include="..\shaders\yellow.frag" />
@@ -183,6 +185,7 @@
     <None Include="tree.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Libraries\stb_image.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="BEN0339.h" />
     <ClInclude Include="Camera.h" />
