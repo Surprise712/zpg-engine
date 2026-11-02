@@ -69,6 +69,11 @@
     <None Include="..\shaders\earth.frag" />
     <None Include="..\shaders\moon.frag" />
     <None Include="..\shaders\sun.frag" />
+    <None Include="..\shaders\night_tree.frag" />
+    <None Include="..\shaders\night_tree.vert" />
+    <None Include="..\shaders\night_bush.vert" />
+    <None Include="..\shaders\night_ground.vert" />
+    <None Include="..\shaders\firefly.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

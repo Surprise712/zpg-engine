@@ -26,10 +26,16 @@ void main(void){
     float diff = max(dot(N, L), 0.0);
     vec4 diffuse = diff * vec4(objectColor, 1.0);
     
-    // Specular s využitím half-vektoru
+    // Specular s využitím half-vektoru (OPRAVA PŘESVITU)
     float shininess = 32.0; 
-    float spec = pow(max(dot(N, H), 0.0), shininess);
-    vec4 specular = spec * vec4(1.0, 1.0, 1.0, 1.0); 
+    float spec = 0.0; // Základ je 0 (žádný odlesk)
+    
+    // Odlesk přidáme JEN tehdy, když na povrch svítí světlo
+    if (diff > 0.0) {
+        spec = pow(max(dot(N, H), 0.0), shininess);
+    }
+    
+    vec4 specular = spec * vec4(1.0, 1.0, 1.0, 1.0);
     
     // Výsledná barva = (ambient * barva planety) + diffuse + specular
     out_Color = (ambient * vec4(objectColor, 1.0)) + diffuse + specular;

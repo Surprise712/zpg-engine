@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -29,6 +30,15 @@ private:
 	double lastMouseX;
 	double lastMouseY;
 	bool firstMouse;
+
+	glm::vec3 fireflyPosition = glm::vec3(0.0f, 1.0f, 0.0f);
+	ShaderProgram* nightForestShader = nullptr;
+	ShaderProgram* nightBushShader = nullptr;
+	ShaderProgram* nightGroundShader = nullptr;
+	ShaderProgram* fireflyShader = nullptr;
+
+	// Čas pro animaci
+	float animationTime = 0.0f;
 
 	void cleanup();
 

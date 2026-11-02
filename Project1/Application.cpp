@@ -373,7 +373,7 @@ void Application::createScenes()
 
     transformation->addTransformation(std::make_unique<DynRotation>(0.5f, glm::vec3(0.2f, 0.0f, 0.0f)));
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.5f, 0.0f)));
-    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.1)));
+    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.1f)));
 
     galaxyScene->addObject(std::make_unique<DrawableObject>(modelEarth, earthShaderProgram, std::move(transformation)));
 
@@ -391,7 +391,7 @@ void Application::createScenes()
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.5f, 0.0f)));          //earth position
     transformation->addTransformation(std::make_unique<DynRotation>(0.5f, glm::vec3(0.0f, 0.0f, 0.4f)));
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.2f, 0.0f, 0.0f)));
-    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.05f)));
+    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.05)));
 
     galaxyScene->addObject(std::make_unique<DrawableObject>(modelMoon, moonShaderProgram, std::move(transformation)));
 
@@ -524,6 +524,160 @@ void Application::createScenes()
     scenes[4]->rotateCamera(90.0f, 0.0f);
     scenes[4]->moveCamera(-8.0f, 0.0f);
 
+
+
+
+    //==Night Forrest Scene==
+
+    auto nforestScene = std::make_unique<Scene>();
+
+    Model::resetVertexFormat();
+
+    // OPRAVENO: Používáme nforestScene místo forestScene
+    nightForestShader = nforestScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/night_tree.vert", "../shaders/night_tree.frag"));
+    nightBushShader = nforestScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/night_bush.vert", "../shaders/night_tree.frag"));
+    nightGroundShader = nforestScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/night_ground.vert", "../shaders/night_tree.frag"));
+    fireflyShader = nforestScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/firefly.vert", "../shaders/yellow.frag"));
+    auto nightLoginShader = nforestScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/light.vert", "../shaders/yellow.frag"));
+
+
+    Model* nmodelTree = nforestScene->addModel(std::make_unique<Model>(tree, sizeof(tree)));
+    Model* nmodelBushes = nforestScene->addModel(std::make_unique<Model>(bushes, sizeof(bushes)));
+    Model* nmodelsun = nforestScene->addModel(std::make_unique<Model>(sphere, sizeof(sphere)));
+    Model* nmodelLogin = nforestScene->addModel(std::make_unique<Model>(login, sizeof(login)));
+
+
+    // Ground
+    static const float nground[] = {
+        -15.0f, -0.51f, -15.0f, 0.2f, 0.4f, 0.1f,
+         15.0f, -0.51f,  15.0f, 0.2f, 0.4f, 0.1f,
+         15.0f, -0.51f, -15.0f, 0.2f, 0.4f, 0.1f,
+
+        -15.0f, -0.51f, -15.0f, 0.2f, 0.4f, 0.1f,
+        -15.0f, -0.51f,  15.0f, 0.2f, 0.4f, 0.1f,
+         15.0f, -0.51f,  15.0f, 0.2f, 0.4f, 0.1f
+    };
+
+    Model* nmodelGround = nforestScene->addModel(std::make_unique<Model>(nground, sizeof(nground)));
+
+    auto ngroundTransformation = std::make_unique<CompositeTransformation>();
+
+    nforestScene->addObject(std::make_unique<DrawableObject>(
+        nmodelGround, nightGroundShader, std::move(ngroundTransformation)));
+
+
+    // Trees
+    std::vector<glm::vec2> ntreePositions;
+
+    for (int i = 0; i < 96;)
+    {
+        float x = (std::rand() % 2401 - 1200) / 100.0f;
+        float z = (std::rand() % 2401 - 1200) / 100.0f;
+
+        glm::vec2 position(x, z);
+        bool tooClose = false;
+
+        for (const auto& other : ntreePositions)
+        {
+            if (glm::distance(position, other) < 2.1f)
+            {
+                tooClose = true;
+                break;
+            }
+        }
+
+        if (tooClose) continue;
+
+        ntreePositions.push_back(position);
+
+        float angle = static_cast<float>(std::rand() % 360);
+        float size = 0.2f + (std::rand() % 71) / 1000.0f;
+
+        auto ntransformation = std::make_unique<CompositeTransformation>();
+
+        ntransformation->addTransformation(std::make_unique<Translation>(glm::vec3(x, -0.5f, z)));
+        ntransformation->addTransformation(std::make_unique<Rotation>(glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f)));
+        ntransformation->addTransformation(std::make_unique<Scale>(glm::vec3(size)));
+
+        nforestScene->addObject(std::make_unique<DrawableObject>(
+            nmodelTree, nightForestShader, std::move(ntransformation)));
+
+        i++;
+    }
+
+
+    // Bushes
+    std::vector<glm::vec2> nbushPositions;
+
+    for (int i = 0; i < 380;)
+    {
+        float x = (std::rand() % 2401 - 1200) / 100.0f;
+        float z = (std::rand() % 2401 - 1200) / 100.0f;
+
+        glm::vec2 position(x, z);
+        bool tooClose = false;
+
+        for (const auto& tree : ntreePositions)
+        {
+            if (glm::distance(position, tree) < 0.9f)
+            {
+                tooClose = true;
+                break;
+            }
+        }
+
+        if (tooClose) continue;
+
+        for (const auto& bush : nbushPositions)
+        {
+            if (glm::distance(position, bush) < 0.7f)
+            {
+                tooClose = true;
+                break;
+            }
+        }
+
+        if (tooClose) continue;
+
+        nbushPositions.push_back(position);
+
+        float angle = static_cast<float>(std::rand() % 360);
+
+        auto ntransformation = std::make_unique<CompositeTransformation>();
+
+        ntransformation->addTransformation(std::make_unique<Translation>(glm::vec3(x, -0.5f, z)));
+        ntransformation->addTransformation(std::make_unique<Rotation>(glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f)));
+        ntransformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.5f)));
+
+        nforestScene->addObject(std::make_unique<DrawableObject>(
+            nmodelBushes, nightBushShader, std::move(ntransformation)));
+
+        i++;
+    }
+
+
+    // Firefly
+    auto nsunTransformation = std::make_unique<CompositeTransformation>();
+
+    nsunTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.1f, 0.0f)));
+    nsunTransformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.02f)));
+
+    nforestScene->addObject(std::make_unique<DrawableObject>(
+        nmodelsun, fireflyShader, std::move(nsunTransformation)));
+
+
+    // Login
+    auto nloginTransformation = std::make_unique<CompositeTransformation>();
+    nloginTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 4.0f, -8.0f)));
+    nloginTransformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.9f)));
+
+    nforestScene->addObject(std::make_unique<DrawableObject>(
+        nmodelLogin, nightLoginShader, std::move(nloginTransformation)));
+
+    scenes.push_back(std::move(nforestScene));
+
+
+
 }
 
 
@@ -607,15 +761,44 @@ void Application::beginFrame()
 
 void Application::drawCurrentScene()
 {
+    // Původní kód s lokálním časem pro hodiny necháš jak je...
     std::time_t now = std::time(nullptr);
     std::tm localTime{};
-
     localtime_s(&localTime, &now);
+    float time = localTime.tm_hour * 3600.0f + localTime.tm_min * 60.0f + localTime.tm_sec;
 
-    float time = localTime.tm_hour * 3600.0f
-        + localTime.tm_min * 60.0f
-        + localTime.tm_sec;
+    // === Výpočet pozice světlušky ===
+    animationTime = static_cast<float>(glfwGetTime()); // Plynulý čas pro animaci
+    float radius = 3.0f;
+    float speed = 0.2f;
 
+    glm::vec3 fireflyPos(
+        cos(animationTime * speed) * radius,
+        0.5f + sin(animationTime * 0.5f) * 0.5f, // Lehké pohupování
+        sin(animationTime * speed) * radius
+    );
+
+    // === Odeslání do všech shaderů ===
+    if (currentScene == 5) // Změň na správný index noční scény
+    {
+        // 1. Předáme pozici stromům
+        nightForestShader->use();
+        nightForestShader->setUniform("lightPosition", fireflyPos);
+
+        // 2. Předáme pozici keřům
+        nightBushShader->use();
+        nightBushShader->setUniform("lightPosition", fireflyPos);
+
+        // 3. Předáme pozici zemi
+        nightGroundShader->use();
+        nightGroundShader->setUniform("lightPosition", fireflyPos);
+
+        // 4. Předáme pozici samotnému modelu světlušky
+        fireflyShader->use();
+        fireflyShader->setUniform("lightPosition", fireflyPos);
+    }
+
+    // Vykreslení scény
     scenes[currentScene]->draw(time);
 }
 
