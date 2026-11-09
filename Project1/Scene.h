@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "Camera.h"
+#include "Skybox.h"
 
 class DrawableObject;
 class Model;
@@ -16,6 +17,7 @@ private:
     std::vector<std::unique_ptr<DrawableObject>> objects;
 
     Camera camera;
+    std::unique_ptr<Skybox> skybox;
 
 public:
     Scene();
@@ -39,5 +41,6 @@ public:
     void setAspectRatio(float aspectRatio);
 
     void moveCamera(float forward, float sideways);
+    void setSkybox(const std::vector<std::string>& faces);
 
 };

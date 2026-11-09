@@ -59,6 +59,9 @@ DrawableObject* Scene::addObject(
 
 void Scene::draw(float time) const
 {
+    if (skybox) {
+        skybox->draw(camera.getViewMatrix(), camera.getProjectionMatrix());
+    }
     // Tento cyklus je v pořádku - updatuje čas pro všechny shadery najednou.
     // (OpenGL si uniformní proměnné pamatuje uvnitř každého shader programu)
     for (const auto& shader : shaderPrograms)
@@ -89,4 +92,11 @@ void Scene::setAspectRatio(float aspectRatio)
 void Scene::moveCamera(float forward, float sideways)
 {
     camera.move(forward, sideways);
+}
+
+void Scene::setSkybox(const std::vector<std::string>& faces) {
+    ShaderProgram* skyboxShader = addShaderProgram(
+        std::make_unique<ShaderProgram>("../shaders/skybox.vert", "../shaders/skybox.frag")
+    );
+    skybox = std::make_unique<Skybox>(faces, skyboxShader);
 }

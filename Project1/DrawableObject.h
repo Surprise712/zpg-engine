@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Transformation.h"
+#include "Texture.h"
 
 #include <memory>
 
@@ -13,6 +14,7 @@ private:
     Model* model;
     ShaderProgram* shaderProgram;
     std::unique_ptr<Transformation> transformation;
+    std::shared_ptr<Texture> texture = nullptr;
 
 public:
     DrawableObject(
@@ -32,4 +34,6 @@ public:
 
     void setTransformation(
         std::unique_ptr<Transformation> transformation);
+
+    void setTexture(std::shared_ptr<Texture> texture);
 };

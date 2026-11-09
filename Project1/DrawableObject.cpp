@@ -32,6 +32,13 @@ void DrawableObject::draw(const glm::vec3& cameraPosition) const
     // (Předpokládám, že vaše třída ShaderProgram má přetíženou metodu setUniform pro vec3)
     shaderProgram->setUniform("viewPosition", cameraPosition);
 
+    if (texture) {
+        shaderProgram->use();
+        texture->bind(0);
+        GLint uniformID = glGetUniformLocation(shaderProgram->getId(), "textureUnitID");
+        glUniform1i(uniformID, 0);
+    }
+
     // 4. Samotné vykreslení
     model->draw();
 }
@@ -49,4 +56,8 @@ const Transformation* DrawableObject::getTransformation() const
 void DrawableObject::setTransformation(std::unique_ptr<Transformation> transformation)
 {
     this->transformation = std::move(transformation);
+}
+
+void DrawableObject::setTexture(std::shared_ptr<Texture> texture) {
+    this->texture = std::move(texture);
 }

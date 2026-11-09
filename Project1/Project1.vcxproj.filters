@@ -42,6 +42,12 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shaders\basic.frag" />
@@ -76,6 +82,8 @@
     <None Include="..\shaders\firefly.vert" />
     <None Include="..\shaders\texture.frag" />
     <None Include="..\shaders\texture.vert" />
+    <None Include="..\shaders\skybox.frag" />
+    <None Include="..\shaders\skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -133,6 +141,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Libraries\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\OrangeChair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\SM_Door.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\SM_EB408.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\SM_Table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\SM_Whiteboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -154,6 +154,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +176,8 @@
     <None Include="..\shaders\night_tree.frag" />
     <None Include="..\shaders\night_tree.vert" />
     <None Include="..\shaders\phong.frag" />
+    <None Include="..\shaders\skybox.frag" />
+    <None Include="..\shaders\skybox.vert" />
     <None Include="..\shaders\sun.frag" />
     <None Include="..\shaders\texture.frag" />
     <None Include="..\shaders\texture.vert" />
@@ -195,6 +199,11 @@
     <ClInclude Include="Models\clock.h" />
     <ClInclude Include="Models\earth.h" />
     <ClInclude Include="Models\moon.h" />
+    <ClInclude Include="Models\OrangeChair.h" />
+    <ClInclude Include="Models\SM_Door.h" />
+    <ClInclude Include="Models\SM_EB408.h" />
+    <ClInclude Include="Models\SM_Table.h" />
+    <ClInclude Include="Models\SM_Whiteboard.h" />
     <ClInclude Include="Models\sphere.h" />
     <ClInclude Include="Models\steelAxe.h" />
     <ClInclude Include="Models\sun.h" />
@@ -203,6 +212,8 @@
     <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Transformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

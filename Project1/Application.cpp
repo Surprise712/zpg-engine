@@ -2,8 +2,6 @@
 #include <glad/gl.h>
 #undef GLAD_GL_IMPLEMENTATION
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 #include "Application.h"
 #include "Scene.h"
@@ -11,6 +9,8 @@
 #include "Model.h"
 #include "ShaderProgram.h"
 #include "Transformation.h"
+#include "Texture.h"
+#include "Skybox.h"
 
 #include "Models/tree.h"
 #include "Models/bushes.h"
@@ -22,6 +22,12 @@
 #include "Models/moon.h"
 #include "Models/clock.h"
 #include "Models/steelAxe.h"
+
+#include "Models/OrangeChair.h"
+#include "Models/SM_Door.h"
+#include "Models/SM_EB408.h"
+#include "Models/SM_Table.h"
+#include "Models/SM_Whiteboard.h"
 
 
 #include <cstdlib>
@@ -394,7 +400,7 @@ void Application::createScenes()
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.0f, 0.5f, 0.0f)));          //earth position
     transformation->addTransformation(std::make_unique<DynRotation>(0.5f, glm::vec3(0.0f, 0.0f, 0.4f)));
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.2f, 0.0f, 0.0f)));
-    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.05)));
+    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.05f)));
 
     galaxyScene->addObject(std::make_unique<DrawableObject>(modelMoon, moonShaderProgram, std::move(transformation)));
 
@@ -408,7 +414,7 @@ void Application::createScenes()
     transformation->addTransformation(std::make_unique<DynRotation>(0.8f, glm::vec3(0.0f, 0.2f, 0.0f)));
     transformation->addTransformation(std::make_unique<Translation>(glm::vec3(0.9f, 0.0f, 0.0f)));
     transformation->addTransformation(std::make_unique<DynRotation>(0.5f, glm::vec3(0.0f, 0.0f, 0.5f)));
-    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.1)));
+    transformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.1f)));
     transformation->addTransformation(std::make_unique<Rotation>(90.0f, glm::vec3(1.0f, 0.0f, 0.0f)));
 
     galaxyScene->addObject(std::make_unique<DrawableObject>(modelAxe, earthShaderProgram, std::move(transformation)));
@@ -687,64 +693,117 @@ void Application::createScenes()
 
     // === Texture Scene ===
     auto textureScene = std::make_unique<Scene>();
+    Model::setVertexFormat(8, 0);
 
-    const float plain[] = {
-        //vrchol,           normála,            uv souřadnice
-        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-        1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+    //Lab
+    auto labShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
 
-       -1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f
-    };
+    auto modelLab = textureScene->addModel(std::make_unique<Model>(SM_EB408, sizeof(SM_EB408)));
 
-    auto textureShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
+    auto labTransformation = std::make_unique<CompositeTransformation>();
 
-    //vertex buffer object (VBO)
-    GLuint VBO = 0;
-    glGenBuffers(1, &VBO); // generate the VBO
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(plain), plain, GL_STATIC_DRAW);
-    //vertex attribute object(VAO)
-    GLuint VAO = 0;
-    glGenVertexArrays(1, &VAO); //generate the VAO
-    glBindVertexArray(VAO); //bind the VAO
-    glEnableVertexAttribArray(0); //enable vertex attributes
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(6 * sizeof(float)));
+    auto labObject = std::make_unique<DrawableObject>(modelLab, labShader, std::move(labTransformation));
 
-    int text_width, text_height, channels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("Models/wooden_fence.png", &text_width, &text_height, &channels, 4);
-    if (!data) {
-        std::cerr << "Error loading texture: wooden_fence.png" << std::endl;
-    }
-    glActiveTexture(GL_TEXTURE0);
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    auto labTexture = std::make_shared<Texture>("Textures/T_EB408.png");
+    labObject->setTexture(labTexture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, text_width, text_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    textureScene->addObject(std::move(labObject));
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    stbi_image_free(data);
 
-    //Set texture unit to fragment shader
-    GLint uniformID = glGetUniformLocation(textureShader->getId(), "../shaders/texture.frag");
-    glUniform1i(uniformID, 0);
+    //Door
+    auto doorShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
+
+    auto modelDoor = textureScene->addModel(std::make_unique<Model>(SM_Door, sizeof(SM_Door)));
+
+    auto doorTransformation = std::make_unique<CompositeTransformation>();
+    doorTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(-2.35f, 0.0f, 7.75f)));
+    doorTransformation->addTransformation(std::make_unique<Scale>(glm::vec3(0.0115f)));
+
+    auto doorObject = std::make_unique<DrawableObject>(modelDoor, doorShader, std::move(doorTransformation));
+
+    auto doorTexture = std::make_shared<Texture>("Textures/T_door_basecolor.png");
+    doorObject->setTexture(doorTexture);
+
+    textureScene->addObject(std::move(doorObject));
+
+
+
+    //Board
+    auto boardShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
+
+    auto modelBoard = textureScene->addModel(std::make_unique<Model>(SM_Whiteboard, sizeof(SM_Whiteboard)));
+
+    auto boardTransformation = std::make_unique<CompositeTransformation>();
+    boardTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(-3.75f, 0.0f, 2.5f)));
+
+    auto boardObject = std::make_unique<DrawableObject>(modelBoard, boardShader, std::move(boardTransformation));
+
+    auto boardTexture = std::make_shared<Texture>("Textures/whiteboard.png");
+    boardObject->setTexture(boardTexture);
+
+    textureScene->addObject(std::move(boardObject));
+
+
+
+
+
+    //Stoly
+    auto tableShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
+
+    auto modelTable = textureScene->addModel(std::make_unique<Model>(SM_Table, sizeof(SM_Table)));
+
+    auto tableTransformation = std::make_unique<CompositeTransformation>();
+    tableTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(-1.75f, 0.0f, 2.5f)));
+    tableTransformation->addTransformation(std::make_unique<Rotation>(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+
+    auto tableObject = std::make_unique<DrawableObject>(modelTable, tableShader, std::move(tableTransformation));
+
+    auto tableTexture = std::make_shared<Texture>("Textures/T_Table_BaseColor.png");
+    tableObject->setTexture(tableTexture);
+
+    textureScene->addObject(std::move(tableObject));
+
+
+
+
+    //Zidle
+    auto chairShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
+
+    auto modelChair = textureScene->addModel(std::make_unique<Model>(OrangeChair, sizeof(OrangeChair)));
+
+    auto chairTransformation = std::make_unique<CompositeTransformation>();
+    chairTransformation->addTransformation(std::make_unique<Translation>(glm::vec3(-1.0f, 0.0f, 2.5f)));
+    chairTransformation->addTransformation(std::make_unique<Rotation>(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+
+    auto chairObject = std::make_unique<DrawableObject>(modelChair, chairShader, std::move(chairTransformation));
+
+    auto chairTexture = std::make_shared<Texture>("Textures/T_OrangeChair_BaseColor.png");
+    chairObject->setTexture(chairTexture);
+
+    textureScene->addObject(std::move(chairObject));
+
+
+
+
+
+
+
+
+
+
 
     scenes.push_back(std::move(textureScene));
+
+    //skybox
+    std::vector<std::string> faces;
+    faces.push_back("Textures/cubemap/posx.jpg");
+    faces.push_back("Textures/cubemap/negx.jpg");
+    faces.push_back("Textures/cubemap/posy.jpg");
+    faces.push_back("Textures/cubemap/negy.jpg");
+    faces.push_back("Textures/cubemap/posz.jpg");
+    faces.push_back("Textures/cubemap/negz.jpg");
+    scenes[6]->setSkybox(faces);
 
 
 }
