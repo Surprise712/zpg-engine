@@ -63,7 +63,8 @@ bool Application::init( int width, int height,const char* title)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // tohle zapina MSAA (antialiasing) - vyhladi hranate okraje kulatych modelu jako slunce
     glfwWindowHint(GLFW_SAMPLES, 4);
-    
+    glfwWindowHint(GLFW_STENCIL_BITS, 8);
+
     window = glfwCreateWindow(
         width,
         height,
@@ -110,6 +111,8 @@ bool Application::init( int width, int height,const char* title)
     glViewport(0, 0, framebufferWidth, framebufferHeight);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     // tohle zapina multisampling
     glEnable(GL_MULTISAMPLE);
     /*glEnable(GL_CULL_FACE);
@@ -694,6 +697,7 @@ void Application::createScenes()
     // === Texture Scene ===
     auto textureScene = std::make_unique<Scene>();
     Model::setVertexFormat(8, 0);
+    int texture_id = 1;
 
     //Lab
     auto labShader = textureScene->addShaderProgram(std::make_unique<ShaderProgram>("../shaders/texture.vert", "../shaders/texture.frag"));
@@ -725,6 +729,8 @@ void Application::createScenes()
     auto doorTexture = std::make_shared<Texture>("Textures/T_door_basecolor.png");
     doorObject->setTexture(doorTexture);
 
+    doorObject->setID(texture_id++);
+
     textureScene->addObject(std::move(doorObject));
 
 
@@ -741,6 +747,7 @@ void Application::createScenes()
 
     auto boardTexture = std::make_shared<Texture>("Textures/whiteboard.png");
     boardObject->setTexture(boardTexture);
+    boardObject->setID(texture_id++);
 
     textureScene->addObject(std::move(boardObject));
 
@@ -761,6 +768,7 @@ void Application::createScenes()
 
     auto tableTexture = std::make_shared<Texture>("Textures/T_Table_BaseColor.png");
     tableObject->setTexture(tableTexture);
+    tableObject->setID(texture_id++);
 
     textureScene->addObject(std::move(tableObject));
 
@@ -780,20 +788,14 @@ void Application::createScenes()
 
     auto chairTexture = std::make_shared<Texture>("Textures/T_OrangeChair_BaseColor.png");
     chairObject->setTexture(chairTexture);
+    chairObject->setID(texture_id++);
 
     textureScene->addObject(std::move(chairObject));
 
-
-
-
-
-
-
-
-
-
+    textureScene->setSpawnTemplate(modelChair, chairShader, chairTexture);
 
     scenes.push_back(std::move(textureScene));
+
 
     //skybox
     std::vector<std::string> faces;
@@ -834,6 +836,74 @@ void Application::processInput(float deltaTime)
     // Mouse
     double mouseX, mouseY;
     glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    // Přepínání režimů klávesami M, N, B
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        interactionMode = 1;
+        std::cout << "Rezim 1: Picking / Mazani objektu po kliknuti" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+        interactionMode = 2;
+        std::cout << "Rezim 2: Vkladani statickeho objektu (unProject)" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        interactionMode = 3;
+        std::cout << "Rezim 3: Zadani 2 bodu P0, P1 pro pohyb objektu" << std::endl;
+    }
+
+    // Obsluha levého tlačítka myši (jen 1x při stisknutí)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        if (!leftMousePressed) {
+            leftMousePressed = true;
+
+            int width, height;
+            glfwGetFramebufferSize(window, &width, &height);
+
+            GLint x = (GLint)mouseX;
+            GLint y = height - (GLint)mouseY;
+
+            if (interactionMode == 1) {
+                // === BOD 1 & 3b: PICKING A SMAZÁNÍ OBJEKTU ===
+                GLuint index = 0;
+                glReadPixels(x, y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+                printf("Kliknuto na souradnice [%d, %d], ID objektu: %u\n", x, y, index);
+
+                if (index > 0) {
+                    // Smaže kliknutý objekt (včetně pohybujícího se modelu)
+                    scenes[currentScene]->removeObjectByID(static_cast<int>(index));
+                }
+            }
+            else if (interactionMode == 2 || interactionMode == 3) {
+                // === BOD 2 & 3a: UNPROJECT ===
+                GLfloat depth = 0.0f;
+                glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
+                if (depth < 1.0f) {
+                    glm::vec3 screenPos = glm::vec3(x, y, depth);
+                    glm::mat4 view = scenes[currentScene]->getViewMatrix();
+                    glm::mat4 projection = scenes[currentScene]->getProjectionMatrix();
+                    glm::vec4 viewport = glm::vec4(0, 0, width, height);
+
+                    glm::vec3 worldPos = glm::unProject(screenPos, view, projection, viewport);
+
+                    if (interactionMode == 2) {
+                        printf("Screen Space: [%d, %d, %.4f] -> World Space: [%.2f, %.2f, %.2f]\n",
+                            x, y, depth, worldPos.x, worldPos.y, worldPos.z);
+
+                        scenes[currentScene]->spawnObjectAt(worldPos);
+                    }
+                    else if (interactionMode == 3) {
+                        scenes[currentScene]->addPathPoint(worldPos);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        leftMousePressed = false;
+    }
+
+
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
@@ -884,7 +954,7 @@ void Application::processInput(float deltaTime)
 
 void Application::beginFrame()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Application::drawCurrentScene()
@@ -996,16 +1066,17 @@ int Application::run()
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         double currentFrame = glfwGetTime();
         float deltaTime = static_cast<float>(currentFrame - lastFrame);
         lastFrame = currentFrame;
 
-        processInput(deltaTime);
-
-        beginFrame();
-        drawCurrentScene();
-        endFrame();
+        beginFrame();        // 1. Vymaže buffery (nastaví stencil na 0)
+        if (currentScene < scenes.size()) {
+            scenes[currentScene]->updateMovingObject(deltaTime);
+        }
+        drawCurrentScene();  // 2. Vykreslí scénu a zapíše ID objektů do stencil bufferu
+        processInput(deltaTime); // 3. Nyní jsou v bufferu zapsaná ID, glReadPixels je přečte!
+        endFrame();          // 4. Prohodí buffery (glfwSwapBuffers)
     }
 
 

@@ -61,3 +61,6 @@ void DrawableObject::setTransformation(std::unique_ptr<Transformation> transform
 void DrawableObject::setTexture(std::shared_ptr<Texture> texture) {
     this->texture = std::move(texture);
 }
+
+void DrawableObject::setID(int newID) { this->id = newID; }
+int DrawableObject::getID() const { return this->id; }

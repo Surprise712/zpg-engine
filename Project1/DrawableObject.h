@@ -15,6 +15,7 @@ private:
     ShaderProgram* shaderProgram;
     std::unique_ptr<Transformation> transformation;
     std::shared_ptr<Texture> texture = nullptr;
+    int id;
 
 public:
     DrawableObject(
@@ -36,4 +37,6 @@ public:
         std::unique_ptr<Transformation> transformation);
 
     void setTexture(std::shared_ptr<Texture> texture);
+    void setID(int newID);
+    int getID() const;
 };

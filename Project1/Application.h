@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -30,6 +31,9 @@ private:
 	double lastMouseX;
 	double lastMouseY;
 	bool firstMouse;
+
+	bool leftMousePressed = false; 
+	int interactionMode = 1;     
 
 	glm::vec3 fireflyPosition = glm::vec3(0.0f, 1.0f, 0.0f);
 	ShaderProgram* nightForestShader = nullptr;
